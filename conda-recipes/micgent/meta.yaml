@@ -1,0 +1,94 @@
+{% set name = "micgent" %}
+{% set version = "1.0.1" %}
+{% set source_type = "git" %}
+{% set git_rev = "at_rel-1.5" %}
+{% set file_ext = "tar.gz" %}
+{% set hash_type = "sha256" %}
+{% set hash_value = "68b90657a3385c4feb17d55ee0cac4e08ec3f2f968a3547cf926e6e6ff1645e1" %}
+
+## It would be nice to have base template in a separate file
+## that gets loaded through Jinja2 `extends` keyword, but Conda
+## only allows single-file Jinja2 templates:
+## https://github.com/conda/conda-build/issues/2684
+##
+
+package:
+  name: '{{ name|lower }}'
+  version: '{{ version }}'
+
+source:
+  {% if source_type=="git" %}
+
+  git_url: 'https://github.com/ngs-mstb/{{ name }}.git'
+  git_rev: '{{ git_rev }}'
+
+  {% elif source_type=="url" %}
+
+  fn: '{{ name }}-{{ version }}.{{ file_ext }}'
+  url: 'https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.{{ file_ext }}'
+  '{{ hash_type }}': '{{ hash_value }}'
+
+  {% else %}
+
+  {{ "Unexpected value of parameter source_type"/0 }}
+
+  {% endif %}
+
+build:
+  skip: True # [py27]
+  number: 0
+  script: |
+      #export CFLAGS="-I$PREFIX/include $CFLAGS"
+      #export CXXFLAGS="-I$PREFIX/include $CXXFLAGS"
+      #export LDFLAGS="-L$PREFIX/lib $LDFLAGS"
+      #export CPATH="${PREFIX}/include $CPATH"
+      cd python
+      $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+  run_exports:
+    {% set build_deps %}
+    - python
+    - setuptools
+    - future
+    - six
+    - argh
+    - argcomplete
+    - biopython
+    - pybedtools
+    - intervals
+    - cutadapt
+    - intervaltree
+    - petl
+    - petlx
+    - pandas
+    - numpy >=1.15
+    - ruamel.yaml
+    - jinja2
+    - beautifulsoup4
+    - lxml
+    - bioblend
+    - pytest
+    {% endset %}
+requirements:
+    ## Tried `build: run_exports` available in conda-build v.3 new features,
+    ## but it did not add anything either to `build` or `run`, contrary to docs (which are sparse).
+    ## Putting stuff only into `host` section was also ignored during build.
+    ## Putting stuff only into `build` resulted in <zlib.h> not found even when adding
+    ## extra envars in the build script, and zlib getting installed into the build environment.
+    ## Using jinja2 block variable set-endset to add things to both `run`, `build` and `host`.
+  build:
+    {{ build_deps }}
+  host:
+    {{ build_deps }}
+  run:
+    {{ build_deps }}
+    - blast
+test:
+  imports:
+    - MICGENT
+    - MICGENT.workflow_util
+  requires:
+    - pytest
+about:
+  home: https://github.com/andreyto/micgent
+  license: GNU General Public License v3 (GPLv3)
+  summary: 'MICGENT Microbial Genomics Toolkit'

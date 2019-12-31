@@ -1,0 +1,67 @@
+{% set name = "pilon" %}
+{% set version = "1.22-at" %}
+{% set source_type = "git" %}
+{% set git_rev = "at_rel-1.1" %}
+{% set file_ext = "tar.gz" %}
+{% set hash_type = "md5" %}
+{% set hash_value = "3c45568dc1b878a9a0316410ec62ab04" %}
+
+## It would be nice to have base template in a separate file
+## that gets loaded through Jinja2 `extends` keyword, but Conda
+## only allows single-file Jinja2 templates:
+## https://github.com/conda/conda-build/issues/2684
+##
+
+package:
+  name: '{{ name|lower }}'
+  version: '{{ version }}'
+
+source:
+  {% if source_type=="git" %}
+
+  git_url: 'https://github.com/ngs-mstb/{{ name }}.git'
+  git_rev: '{{ git_rev }}'
+
+  {% elif source_type=="url" %}
+
+  fn: '{{ name }}-{{ version }}.{{ file_ext }}'
+  url: https://github.com/broadinstitute/{{ name }}/releases/download/v{{ version }}/{{ name }}-{{ version }}.{{ file_ext }}
+  '{{ hash_type }}': '{{ hash_value }}'
+
+  {% else %}
+
+  {{ "Unexpected value of parameter source_type"/0 }}
+
+  {% endif %}
+
+build:
+  number: 0
+  run_exports:
+    {% set build_deps %}
+    - java-jdk
+    - scala
+    {% endset %}
+requirements:
+    ## Tried `build: run_exports` available in conda-build v.3 new features,
+    ## but it did not add anything either to `build` or `run`, contrary to docs (which are sparse).
+    ## Putting stuff only into `host` section was also ignored during build.
+    ## Putting stuff only into `build` resulted in <zlib.h> not found even when adding
+    ## extra envars in the build script, and zlib getting installed into the build environment.
+    ## Using jinja2 block variable set-endset to add things to both `run`, `build` and `host`.
+  build:
+    {{ build_deps }}
+    - sbt
+  host:
+    {{ build_deps }}
+  run:
+    {{ build_deps }}
+    - python
+test:
+  commands:
+    - pilon --help | grep  'Usage'
+    - pilon --jar_dir
+
+about:
+  home: https://github.com/broadinstitute/pilon/
+  license: GPLv2
+  summary: Pilon is an automated genome assembly improvement and variant detection tool.

@@ -1,0 +1,51 @@
+{% set name = "ngs-mstb" %}
+{% set version = "1.0.1" %}
+
+package:
+  name: '{{ name|lower }}'
+  version: '{{ version }}'
+## This is a pure meta-package now - only run-time dependencies.
+## The reason to use a meta-package instead of environment.yaml
+## is that we can turn this into a "super"-package by adding script
+## to the build section. For example, adding non-pip install scripts
+## such as R install.packages().
+## In that case, we will need to put some dependencies into both
+## build and run subsections (through Jinja2 block, for example).
+## It is best to use installation switches in the build script that disable
+## the dependency installation wherever possible and list dependencies
+## in the recipe to avoid clobbering files.
+## Note: building the package does not fix the versions of the dependencies.
+## Unless pinned in the requirements below, the versions will be resolved
+## during the installation per usual Conda rules.
+build:
+  skip: True # [py27]
+  number: 0
+requirements:
+  run:
+    - micgent
+    - ariba ==2.11.1-at
+    - pilon ==1.22-at
+    - spades
+    - bbmap
+    - fastqc
+    - multiqc
+    - seqkit
+    - minimap2
+    - mummer >3,<4
+    #- picard
+    - biopython
+    ## for RADAR upload; bbmap and others have java as dep anyway, 
+    ## but this will force the newer version
+    - openjdk >=11
+    - numpy
+test:
+  imports:
+    - MICGENT
+    - MICGENT.workflow_util
+  commands:
+    - spades.py --help
+    - ariba --help
+about:
+  home: https://github.com/andreyto/micgent
+  license: GNU General Public License v3 (GPLv3)
+  summary: 'NGS microbial sequencing toolbox'

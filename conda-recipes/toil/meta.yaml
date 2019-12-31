@@ -1,0 +1,42 @@
+package:
+    name: toil
+    version: 3.17.0a1-at
+source:
+    git_rev: at_rel-1.2
+    git_url: https://github.com/ngs-mstb/toil.git
+build:
+    entry_points:
+        - toil = toil.utils.toilMain:main
+        - _toil_worker = toil.worker:main
+        - toil-wdl-runner = toil.wdl.toilwdl:main
+        - cwltoil = toil.cwl.cwltoil:main
+        - toil-cwl-runner = toil.cwl.cwltoil:main
+        - _toil_mesos_executor = toil.batchSystems.mesos.executor:main
+    number: 1
+    skip: True # [not py27]
+    script: python -m pip install --ignore-installed ".[cwl]"
+requirements:
+    build:
+        - protobuf==3.5.1
+        - setuptools
+        - python
+    run:
+        - python
+        - protobuf==3.5.1
+        - nodejs
+test:
+    imports:
+        - toil
+        - toil.batchSystems
+        - toil.cwl
+        - toil.jobStores
+        - toil.lib
+        - toil.utils
+        - toil.wdl
+    commands:
+        - cwltoil --help
+
+about:
+    home: https://github.com/BD2KGenomics/toil
+    license: Apache License v2.0
+    summary: Pipeline management software for clusters.

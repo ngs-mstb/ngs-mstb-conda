@@ -1,0 +1,89 @@
+## A skeleton for generating conda recipes from setup.py
+## copied from https://gist.github.com/jakirkham/726ed57f1fef0c94fce22b7429124730
+## This can work out-of-the box for simple packages, or use `conda render` and then
+## edit the recipe.
+## The source if this function is here, alongside with other plugin functions made available to
+## jinja2 templates: https://github.com/conda/conda-build/blob/master/conda_build/jinja_context.py
+## It looks like it monkey-patches distutils and related modules, and then actually runs setup in a
+## temporary directory while collecting data from patched distutils calls.
+## How returned data is structured (using toil as example):
+## Optional dependencies:
+## "extras_require": {"mesos": ["psutil==3.0.1", "protobuf==3.5.1"],...}}
+## "entry_points": {"console_scripts": [ "toil-cwl-runner = toil.cwl.cwltoil:main [cwl]",... ]}
+## Extra arguments that might have to be used if setup.py has to access other package code, like
+## it does in case of toil:
+## setup_file='setup.py', from_recipe_dir=False, recipe_dir=None,  permit_undefined_jinja=True
+## from_recipe_dir=True,recipe_dir=environ["SRC_DIR"],
+
+{% set data = load_setup_py_data(setup_file=environ["SRC_DIR"]+"/setup.py") %}
+{% set name = "toil" %}
+{% set deps %}
+    {% for req in data.get('setup_requires', []) %}
+    - {{ req.replace(">= ", ">=") }}
+    {% endfor %}
+    {% for req in data.get('install_requires', []) %}
+    - {{ req.replace(">= ", ">=") }}
+    {% endfor %}
+    {% for req in data.get('extras_require', {}).get('all',[]) %}
+    - {{ req.replace(">= ", ">=") }}
+    {% endfor %}
+{% endset %}
+
+package:
+  name: '{{ name|lower }}'
+  ## setting name from load_setup_data() is no longer allowed:
+  ## https://github.com/conda/conda-build/issues/2475
+  #name: {{ data.get('name').lower() }}
+  version: "{{ data.get('version') }}"
+source:
+  git_url: 'https://github.com/ngs-mstb/{{ name }}.git'
+  git_rev: '20e5cda'
+build:
+  number: 0
+  noarch: python
+  script: python setup.py install --single-version-externally-managed --record=record.txt
+  {% if 'entry_points' in data.keys() and 'console_scripts' in data['entry_points'] %}
+  entry_points:
+  {% for each_console_script in data['entry_points']['console_scripts'] %}
+    - {{ each_console_script }}
+  {% endfor %}
+  {% endif %}
+
+requirements:
+  build:
+    - python
+    - setuptools
+    {{ deps }}
+  run:
+    - python
+    - setuptools
+    {{ deps }}
+test:
+  {% if data.get('tests_require', []) %}
+  requires:
+    {% for req in data['tests_require'] %}
+    - {{ req }}
+    {% endfor %}
+  {% endif %}
+  {% if data.get('packages', []) %}
+  imports:
+    {% for req in data['packages'] %}
+    - {{ req }}
+    {% endfor %}
+  {% endif %}
+  commands:
+    - cwltoil --help
+
+about:
+  {% if data.get('url', '') %}
+  home: {{ data['url'] }}
+  {% endif %}
+  {% if data.get('license', '') %}
+  license: {{ data['license'] }}
+  {% endif %}
+  {% if data.get('description', '') %}
+  summary: {{ data['description'] }}
+  {% endif %}
+
+extra:
+  data: {{ data }}
