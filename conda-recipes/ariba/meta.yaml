@@ -49,7 +49,7 @@ build:
     - beautifulsoup4 >=4.1.0
     - dendropy >=4.2.0
     - matplotlib
-    - pyfastaq ==3.17.0-at
+    - pyfastaq ==3.17.0at
     - pysam >=0.9.1
     - pymummer >=0.10.2
     - zlib {{ CONDA_ZLIB }}*
