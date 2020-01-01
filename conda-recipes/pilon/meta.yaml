@@ -1,5 +1,5 @@
 {% set name = "pilon" %}
-{% set version = "1.22-at" %}
+{% set version = "1.22at" %}
 {% set source_type = "git" %}
 {% set git_rev = "at_rel-1.1" %}
 {% set file_ext = "tar.gz" %}

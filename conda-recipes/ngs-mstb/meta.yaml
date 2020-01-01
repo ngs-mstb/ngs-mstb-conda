@@ -23,8 +23,8 @@ build:
 requirements:
   run:
     - micgent
-    - ariba ==2.11.1-at
-    - pilon ==1.22-at
+    - ariba ==2.11.1at
+    - pilon ==1.22at
     - spades
     - bbmap
     - fastqc
