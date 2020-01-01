@@ -1,5 +1,5 @@
 {% set name = "pyfastaq" %}
-{% set version = "3.17.0-at" %}
+{% set version = "3.17.0at" %}
 {% set source_type = "git" %}
 {% set git_rev = "at_rel-1.1" %}
 {% set file_ext = "tar.gz" %}
