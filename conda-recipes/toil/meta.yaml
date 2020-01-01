@@ -24,6 +24,19 @@ requirements:
         - python
         - protobuf==3.5.1
         - nodejs
+        - boto==2.48.0
+        - boto3>=1.7.50, <2.0
+        - futures==3.1.1
+        - docker==2.5.1
+        - subprocess32<=3.5.2
+        - python-dateutil
+        - dill==0.2.7.1
+        - six>=1.10.0
+        - future
+        - requests==2.18.4
+        - cwltool==1.0.20180518123035
+        - schema-salad>=2.6, <3
+        - galaxy-lib==17.9.3
 test:
     imports:
         - toil
