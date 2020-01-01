@@ -2,5 +2,5 @@
 set -ex -o pipefail
 NGS_MSTB_CONDA_CHANNELS="-c local -c bioconda -c defaults -c conda-forge -c conda-cluster"
 conda create $NGS_MSTB_CONDA_CHANNELS -n ngs-mstb ngs-mstb
-conda create $NGS_MSTB_CONDA_CHANNELS -n toil toil=3.17.0a1-at
+conda create $NGS_MSTB_CONDA_CHANNELS -n toil toil=3.18.0a1at
 
