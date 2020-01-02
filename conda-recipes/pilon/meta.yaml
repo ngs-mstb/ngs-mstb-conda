@@ -38,7 +38,6 @@ build:
   number: 0
   run_exports:
     {% set build_deps %}
-    - java-jdk
     - scala
     {% endset %}
 requirements:
