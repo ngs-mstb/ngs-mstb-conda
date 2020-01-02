@@ -8,7 +8,7 @@ NGS_MSTB_CONDA_CHANNELS="-c local -c bioconda -c defaults -c conda-forge -c cond
 for pkg in pyfastaq ariba petlx micgent pilon; do
     conda build $NGS_MSTB_CONDA_CHANNELS --python 3.6 conda-recipes/$pkg
 done
-#conda build $NGS_MSTB_CONDA_CHANNELS --python 2.7 conda-recipes/toil
+conda build $NGS_MSTB_CONDA_CHANNELS --python 2.7 conda-recipes/toil
 conda build $NGS_MSTB_CONDA_CHANNELS conda-recipes/ngs-mstb
 
 conda build purge
