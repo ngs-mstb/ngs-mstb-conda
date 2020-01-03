@@ -1,7 +1,7 @@
 {% set name = "micgent" %}
 {% set version = "1.2.0" %}
 {% set source_type = "git" %}
-{% set git_rev = "at_rel-1.6" %}
+{% set git_rev = "at_rel-1.7" %}
 {% set file_ext = "tar.gz" %}
 {% set hash_type = "sha256" %}
 {% set hash_value = "68b90657a3385c4feb17d55ee0cac4e08ec3f2f968a3547cf926e6e6ff1645e1" %}
